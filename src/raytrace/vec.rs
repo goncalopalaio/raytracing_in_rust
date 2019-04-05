@@ -7,6 +7,19 @@ impl Vec3 {
     pub fn new(e0: f32, e1: f32, e2: f32) -> Vec3 {
         Vec3 { e: [e0, e1, e2] }
     }
+
+    pub fn reset_to_zeros(&mut self) {
+        self.e[0] = 0.0;
+        self.e[1] = 0.0;
+        self.e[2] = 0.0;
+    }
+
+    pub fn sqrt_each(&mut self) {
+        self.e[0] = f32::sqrt(self.e[0]);
+        self.e[1] = f32::sqrt(self.e[1]);
+        self.e[2] = f32::sqrt(self.e[2]);
+    }
+
     pub fn x(&self) -> f32 {
         self.e[0]
     }

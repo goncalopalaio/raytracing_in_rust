@@ -1,2 +1,5 @@
 /target
 **/*.rs.bk
+src/tmp*
+src/raytrace/tmp*
+output.ppm

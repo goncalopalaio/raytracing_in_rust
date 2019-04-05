@@ -1,0 +1,44 @@
+
+let nx = 200;
+let ny = 200;
+let ns = 10;
+
+cargo run --release
+
+for i in {1..15}; do rm -f output.ppm && time target/release/raytracing_with_rust > output.ppm; done
+
+Original
+
+target/release/raytracing_with_rust > output.ppm  10,34s user 0,12s system 99% cpu 10,499 total
+target/release/raytracing_with_rust > output.ppm  10,12s user 0,12s system 99% cpu 10,280 total
+target/release/raytracing_with_rust > output.ppm  10,25s user 0,11s system 99% cpu 10,389 total
+target/release/raytracing_with_rust > output.ppm  10,38s user 0,12s system 99% cpu 10,532 total
+target/release/raytracing_with_rust > output.ppm  10,48s user 0,12s system 99% cpu 10,634 total
+target/release/raytracing_with_rust > output.ppm  10,33s user 0,11s system 99% cpu 10,478 total
+target/release/raytracing_with_rust > output.ppm  10,43s user 0,13s system 99% cpu 10,614 total
+target/release/raytracing_with_rust > output.ppm  10,28s user 0,14s system 99% cpu 10,492 total
+target/release/raytracing_with_rust > output.ppm  10,91s user 0,13s system 99% cpu 11,101 total
+target/release/raytracing_with_rust > output.ppm  10,40s user 0,12s system 99% cpu 10,547 total
+target/release/raytracing_with_rust > output.ppm  10,79s user 0,13s system 99% cpu 10,988 total
+target/release/raytracing_with_rust > output.ppm  10,39s user 0,12s system 99% cpu 10,564 total
+target/release/raytracing_with_rust > output.ppm  10,46s user 0,13s system 99% cpu 10,640 total
+target/release/raytracing_with_rust > output.ppm  10,43s user 0,12s system 99% cpu 10,578 total
+
+
+Removed allocation of zero vector in main loop
+Removed allocation of vector of sqrt values
+
+target/release/raytracing_with_rust > output.ppm  9,90s user 0,12s system 99% cpu 10,084 total
+target/release/raytracing_with_rust > output.ppm  9,87s user 0,12s system 99% cpu 10,022 total
+target/release/raytracing_with_rust > output.ppm  10,35s user 0,12s system 99% cpu 10,495 total
+target/release/raytracing_with_rust > output.ppm  10,25s user 0,12s system 99% cpu 10,430 total
+target/release/raytracing_with_rust > output.ppm  9,64s user 0,12s system 99% cpu 9,800 total
+target/release/raytracing_with_rust > output.ppm  9,95s user 0,12s system 99% cpu 10,119 total
+target/release/raytracing_with_rust > output.ppm  10,39s user 0,12s system 99% cpu 10,538 total
+target/release/raytracing_with_rust > output.ppm  10,63s user 0,12s system 99% cpu 10,780 total
+target/release/raytracing_with_rust > output.ppm  10,14s user 0,13s system 99% cpu 10,309 total
+target/release/raytracing_with_rust > output.ppm  10,11s user 0,12s system 99% cpu 10,284 total
+target/release/raytracing_with_rust > output.ppm  10,24s user 0,14s system 99% cpu 10,442 total
+target/release/raytracing_with_rust > output.ppm  10,11s user 0,13s system 99% cpu 10,292 total
+target/release/raytracing_with_rust > output.ppm  10,56s user 0,12s system 99% cpu 10,716 total
+target/release/raytracing_with_rust > output.ppm  10,41s user 0,13s system 99% cpu 10,592 total
