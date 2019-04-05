@@ -1,59 +1,102 @@
 pub mod raytrace;
 
-use raytrace::vec::Vec3;
-use raytrace::ray::Ray;
+use raytrace::camera::drand48;
+use raytrace::camera::Camera;
 use raytrace::hitable::Hitable;
 use raytrace::hitable_list::HitableList;
-use raytrace::sphere::Sphere;
-use raytrace::camera::Camera;
-use raytrace::camera::drand48;
+use raytrace::material::Dielectric;
 use raytrace::material::Lambertian;
 use raytrace::material::Metal;
-use raytrace::material::Dielectric;
+use raytrace::ray::Ray;
+use raytrace::sphere::Sphere;
+use raytrace::vec::Vec3;
 
-fn color(r: Ray, world: &HitableList, depth: i32)-> Vec3{
+fn color(r: Ray, world: &HitableList, depth: i32) -> Vec3 {
     match world.hit(r, 0.001, std::f32::MAX) {
         Some(rec) => {
             let mut scattered: Ray = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0));
-            let mut attenuation:Vec3 = Vec3::new(0.0, 0.0, 0.0);
-            if depth<50 && rec.material.scatter(&r, &rec, &mut attenuation, &mut scattered){
-                attenuation*color(scattered, world, depth+1)
-            }else{
+            let mut attenuation: Vec3 = Vec3::new(0.0, 0.0, 0.0);
+            if depth < 50
+                && rec
+                    .material
+                    .scatter(&r, &rec, &mut attenuation, &mut scattered)
+            {
+                attenuation * color(scattered, world, depth + 1)
+            } else {
                 Vec3::new(0.0, 0.0, 0.0)
             }
         }
         None => {
             let unit_direction = Vec3::make_unit_vector(r.direction());
             let t = 0.5 * (unit_direction.y() + 1.0);
-            return (1.0-t) * Vec3::new(1.0, 1.0, 1.0) + t*Vec3::new(0.5, 0.7, 1.0);
+            return (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0);
         }
     }
 }
 
 //--------
-fn random_scene()-> HitableList{
+fn random_scene() -> HitableList {
     let n = 500;
-    let mut world = HitableList::new(n+1);
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, -1000.0, 0.0), 1000.0, Box::new(Lambertian::new(Vec3::new(0.5, 0.5, 0.5))))));
-    
+    let mut world = HitableList::new(n + 1);
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Box::new(Lambertian::new(Vec3::new(0.5, 0.5, 0.5))),
+    )));
+
     for a in -11..11 {
         for b in -11..11 {
             let choose_mat = drand48();
-            let center = Vec3::new(a as f32 + 0.9*drand48(), 0.2, b as f32 + 0.9*drand48());
-            if (center-Vec3::new(4.0, 0.2, 0.0)).length()>0.9{
-                if choose_mat <0.8 {
-                    world.add(Box::new(Sphere::new(center, 0.2, Box::new(Lambertian::new(Vec3::new(drand48()*drand48(), drand48()*drand48(), drand48()*drand48()))))));
-                }else if choose_mat<0.95{
-                    world.add(Box::new(Sphere::new(center, 0.2, Box::new(Metal::new(Vec3::new(0.5*(1.0+drand48()), 0.5*(1.0+drand48()), 0.5*(1.0+drand48())), 0.5*(1.0+drand48()))))));
-                }else{
-                    world.add(Box::new(Sphere::new(center, 0.2, Box::new(Dielectric::new(1.5)))));
+            let center = Vec3::new(a as f32 + 0.9 * drand48(), 0.2, b as f32 + 0.9 * drand48());
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Box::new(Lambertian::new(Vec3::new(
+                            drand48() * drand48(),
+                            drand48() * drand48(),
+                            drand48() * drand48(),
+                        ))),
+                    )));
+                } else if choose_mat < 0.95 {
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Box::new(Metal::new(
+                            Vec3::new(
+                                0.5 * (1.0 + drand48()),
+                                0.5 * (1.0 + drand48()),
+                                0.5 * (1.0 + drand48()),
+                            ),
+                            0.5 * (1.0 + drand48()),
+                        )),
+                    )));
+                } else {
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Box::new(Dielectric::new(1.5)),
+                    )));
                 }
             }
         }
     }
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, 1.0, 0.0), 1.0, Box::new(Dielectric::new(1.5)))));
-    world.add(Box::new(Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, Box::new(Lambertian::new(Vec3::new(0.4, 0.2, 0.1))))));
-    world.add(Box::new(Sphere::new(Vec3::new(4.0, 1.0, 0.0), 1.0, Box::new(Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0)))));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, 1.0, 0.0),
+        1.0,
+        Box::new(Dielectric::new(1.5)),
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(-4.0, 1.0, 0.0),
+        1.0,
+        Box::new(Lambertian::new(Vec3::new(0.4, 0.2, 0.1))),
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(4.0, 1.0, 0.0),
+        1.0,
+        Box::new(Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0)),
+    )));
 
     world
 }
@@ -65,19 +108,19 @@ fn main() {
     let ns = 10;
     print!("P3\n{} {}\n255\n", nx, ny);
 
-    let look_from:Vec3 = Vec3::new(13.0, 2.0, 3.0);
-    let look_at:Vec3 = Vec3::new(0.0, 0.0, 0.0);
+    let look_from: Vec3 = Vec3::new(13.0, 2.0, 3.0);
+    let look_at: Vec3 = Vec3::new(0.0, 0.0, 0.0);
     let dist_to_focus = 10.0;
-    let aperature:f32 = 0.1;
+    let aperature: f32 = 0.1;
 
     let cam = Camera::new(
         look_from,
         look_at,
         Vec3::new(0.0, 1.0, 0.0),
         20.0,
-        nx as f32/ny as f32,
+        nx as f32 / ny as f32,
         aperature,
-        dist_to_focus
+        dist_to_focus,
     );
 
     // let mut world = HitableList::new(2);
@@ -101,7 +144,7 @@ fn main() {
             let ir = (255.99 * col[0]) as i32;
             let ig = (255.99 * col[1]) as i32;
             let ib = (255.99 * col[2]) as i32;
-            print!("{} {} {}\n", ir, ig, ib );
+            print!("{} {} {}\n", ir, ig, ib);
         }
     }
 }
